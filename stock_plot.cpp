@@ -31,12 +31,17 @@ vector<vector<int> > c5;
 vector<vector<int> > c6;
 vector<vector<int> > c7;
 vector<vector<int> > c8;
+vector<vector<float> > returns;
 
 
 vector<vector<float> > stab5;
 vector<vector<float> > stab6;
 vector<vector<float> > stab7;
 vector<vector<float> > stab8;
+
+float zoom_fac=1;
+float offsetx=0;
+float offsety=0;
 
 void Tokenize(string& str, vector<string>& tokens, const string& delimiters)
 {
@@ -51,29 +56,64 @@ void Tokenize(string& str, vector<string>& tokens, const string& delimiters)
 }
 
 void KeyboardFunc(unsigned char key, int x, int y) {
-    if (key == ' ') {
-      which_time_period++;
-      which_time_period=which_time_period%max_time_steps;
-      cout<<which_time_period<<endl;
-      glutPostRedisplay();
-      glutSwapBuffers();
-    } else if (key == 27) {
+    if (key == 27) {
         exit(1);
     }
+    else if(key=='z')
+      {
+	zoom_fac+=.1;
+      }
+    else if(key=='x')
+      {
+	if(zoom_fac>.1)
+	  {
+	zoom_fac-=.1;
+	  }
+      }
+
+      glutPostRedisplay();
+      glutSwapBuffers();
+
 }
 
 
 
 void processSpecialKeys(int key, int x, int y) {
 
+
+
     switch (key) {
-        case GLUT_KEY_HOME:
-	  which_cluster_size++;
-	  which_cluster_size=which_cluster_size%4;
+    case GLUT_KEY_F1:
+      if(which_time_period<max_time_steps-1)
+	{
+	  which_time_period++;
+	}
+      break;
+    case GLUT_KEY_F2:
+      if(which_time_period>0)
+	{
+	  which_time_period--;
+	}
+      break;
+    case GLUT_KEY_HOME:
+      which_cluster_size++;
+      which_cluster_size=which_cluster_size%4;
+      break;
+    case GLUT_KEY_RIGHT:
+      offsetx+=.1;
+      break;
+    case GLUT_KEY_LEFT:
+      offsetx-=.1;
+      break;
+    case GLUT_KEY_UP:
+      offsety+=.1;
+      break;
+    case GLUT_KEY_DOWN:
+      offsety-=.1;
+      break;
+    }
 	  glutPostRedisplay();
 	  glutSwapBuffers();
-
-    }
 }
 
 void initRendering() 
@@ -102,9 +142,10 @@ void draw3()
 	glBegin(GL_QUADS);					       
 	for(int i=0;i<400;i++)
 	  {
-	    float posx=pc1[i][which_time_period];
-	    float posy=pc2[i][which_time_period];
-	    float diff=.01;
+	    float posx=(pc1[i][which_time_period]/zoom_fac)-offsetx;
+	    float posy=(pc2[i][which_time_period]/zoom_fac)-offsety;
+	    float diff=.01*(1+returns[i][which_time_period]);
+
 	    switch(which_cluster_size)
 	      {
 	      case 0:
@@ -140,9 +181,9 @@ void draw2()
 	glBegin(GL_QUADS);					       
 	for(int i=0;i<400;i++)
 	  {
-	    float posx=pc1[i][which_time_period];
-	    float posy=pc2[i][which_time_period];
-	    float diff=.01;
+	    float posx=(pc1[i][which_time_period]/zoom_fac)-offsetx;
+	    float posy=(pc2[i][which_time_period]/zoom_fac)-offsety;
+	    float diff=.01*(1+returns[i][which_time_period]);
 	    switch(which_cluster_size)
 	      {
 	      case 0:
@@ -175,12 +216,20 @@ void draw()
     glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
-	glBegin(GL_QUADS);					       
+			       
 	for(int i=0;i<400;i++)
 	  {
-	    float posx=pc1[i][which_time_period];
-	    float posy=pc2[i][which_time_period];
-	    float diff=.01;
+	    if(returns[i][which_time_period]>0)
+	      {
+		glBegin(GL_QUADS);		
+	      }
+	    else
+	      {
+		glBegin(GL_LINE_LOOP);
+	      }
+	    float posx=(pc1[i][which_time_period]/zoom_fac)-offsetx;
+	    float posy=(pc2[i][which_time_period]/zoom_fac)-offsety;
+	    float diff=.01*(1.0+4*returns[i][which_time_period]);
 	    switch(which_cluster_size)
 	      {
 	      case 0:
@@ -201,8 +250,9 @@ void draw()
             glVertex3f(posx + diff, posy - diff, 0.0f);
             glVertex3f(posx + diff, posy + diff, 0.0f);
             glVertex3f(posx - diff, posy + diff, 0.0f);
-	  }
 	glEnd();		
+	  }
+
 
     glutSwapBuffers();		
     glutPostRedisplay();
@@ -273,37 +323,17 @@ brown.push_back(.07);
 	vector<int> c6_temp;
 	vector<int> c7_temp;
 	vector<int> c8_temp;
+	vector<float> ret_temp;
 	
-	for(int i=0;i<sv.size();i+=6)
+	for(int i=0;i<sv.size();i+=7)
 	  {
-            
-	    if(atof(sv[i].c_str())>total_max1)
-	      {
-		total_max1=atof(sv[i].c_str());
-	      }
-
-	    if(atof(sv[i].c_str())<total_min1)
-	      {
-		total_min1=atof(sv[i].c_str());
-	      }
-
-
-	    if(atof(sv[i+1].c_str())>total_max2)
-	      {
-		total_max2=atof(sv[i+1].c_str());
-	      }
-
-	    if(atof(sv[i+1].c_str())<total_min2)
-	      {
-		total_min2=atof(sv[i+1].c_str());
-	      }
-
 	    pc1_temp.push_back(atof(sv[i].c_str()));
 	    pc2_temp.push_back(atof(sv[i+1].c_str()));
 	    c5_temp.push_back(atoi(sv[i+2].c_str()));
 	    c6_temp.push_back(atoi(sv[i+3].c_str()));
 	    c7_temp.push_back(atoi(sv[i+4].c_str()));
 	    c8_temp.push_back(atoi(sv[i+5].c_str()));
+	    ret_temp.push_back(atof(sv[i+6].c_str()));
 	  }
 		
 	pc1.push_back(pc1_temp);
@@ -312,12 +342,9 @@ brown.push_back(.07);
 	c6.push_back(c6_temp);
 	c7.push_back(c7_temp);
 	c8.push_back(c8_temp);
+	returns.push_back(ret_temp);
       }
 
-	float posx=pc1[0][0];
-	float posy=pc2[0][0];
-
-	cout<<pc1.size()<<endl;
 
 
     // Init OpenGL stuff
@@ -339,7 +366,7 @@ brown.push_back(.07);
     //End Window 1 -----------------
 
     //Window 2 ---------------------
-    glutInitWindowPosition(300, 300);
+    glutInitWindowPosition(700, 300);
     glutInitWindowSize(300, 50);
     int wind2=glutCreateWindow("2");
 
@@ -352,7 +379,7 @@ brown.push_back(.07);
     //End Window 2 -----------------
 
     //Window 3 ---------------------
-    glutInitWindowPosition(400, 400);
+    glutInitWindowPosition(800, 400);
     glutInitWindowSize(300, 50);
 
     int wind3=glutCreateWindow("2");
