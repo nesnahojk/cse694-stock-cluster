@@ -1,10 +1,12 @@
 clear
-load changedata.txt
+%load changedata.txt
+load logData.txt
 
 
+changedata=logData;
 num=400;
 
-newData=zeros(num,210);
+newData=zeros(num,245);
 
 
 t=25
@@ -54,10 +56,11 @@ endif
     newData(i,j+3)=y6(i);
     newData(i,j+4)=y7(i);
     newData(i,j+5)=y8(i);
+    newData(i,j+6)=returns(i,t);
 endfor
 
 t=t+8;
-j=j+6;
+j=j+7;
 endwhile
 
 
