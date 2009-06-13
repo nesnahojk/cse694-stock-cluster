@@ -43,6 +43,48 @@ float zoom_fac=1;
 float offsetx=0;
 float offsety=0;
 
+const double Xmin = 0.0, Xmax = 3.0;
+const double Ymin = 0.0, Ymax = 3.0;
+
+void resizeWindow(int w, int h)
+{
+	double scale, center;
+	double windowXmin, windowXmax, windowYmin, windowYmax;
+
+	// Define the portion of the window used for OpenGL rendering.
+	glViewport( 0, 0, w, h );	// View port uses whole window
+
+	// Set up the projection view matrix: orthographic projection
+	// Determine the min and max values for x and y that should appear in the window.
+	// The complication is that the aspect ratio of the window may not match the
+	//		aspect ratio of the scene we want to view.
+	w = (w==0) ? 1 : w;
+	h = (h==0) ? 1 : h;
+	if ( (Xmax-Xmin)/w < (Ymax-Ymin)/h ) {
+		scale = ((Ymax-Ymin)/h)/((Xmax-Xmin)/w);
+		center = (Xmax+Xmin)/2;
+		windowXmin = center - (center-Xmin)*scale;
+		windowXmax = center + (Xmax-center)*scale;
+		windowYmin = Ymin;
+		windowYmax = Ymax;
+	}
+	else {
+		scale = ((Xmax-Xmin)/w)/((Ymax-Ymin)/h);
+		center = (Ymax+Ymin)/2;
+		windowYmin = center - (center-Ymin)*scale;
+		windowYmax = center + (Ymax-center)*scale;
+		windowXmin = Xmin;
+		windowXmax = Xmax;
+	}
+	
+	// Now that we know the max & min values for x & y that should be visible in the window,
+	//		we set up the orthographic projection.
+	glMatrixMode( GL_PROJECTION );
+	glLoadIdentity();
+	glOrtho( windowXmin, windowXmax, windowYmin, windowYmax, -1, 1 );
+}
+
+
 void Tokenize(string& str, vector<string>& tokens, const string& delimiters)
 {
     string::size_type lastPos = str.find_first_not_of(delimiters, 0);
@@ -129,20 +171,6 @@ void processSpecialKeys(int key, int x, int y) {
 	  glutSwapBuffers();
 }
 
-void initRendering() 
-{
-    glEnable(GL_DEPTH_TEST);
-
-    glPointSize(8);
-    glLineWidth(5);
-
-    glEnable(GL_POINT_SMOOTH);
-    glEnable(GL_LINE_SMOOTH);
-    glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
-    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-    glEnable (GL_BLEND); 
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-}
 
 
 
@@ -205,21 +233,19 @@ void drawStab()
       }
 
 	glBegin(GL_QUADS);	
-	cout<<user_select<<endl;
+
 	glColor4f(1,0,0,0);
 	glVertex3f(-1,total/which_time_period/400, 0.0f);
 	glVertex3f(0, total/which_time_period/400, 0.0f);
 	glVertex3f(0, -1, 0.0f);
 	glVertex3f(-1, -1, 0);
 
-	if(which_time_period-user_select>0)
-	  {
 	glColor4f(0,1,0,0);
-	glVertex3f(0,user/(which_time_period-user_select)/400, 0.0f);
-	glVertex3f(1, user/(which_time_period-user_select)/400, 0.0f);
+	glVertex3f(0,user/(user_select)/400, 0.0f);
+	glVertex3f(1, user/(user_select)/400, 0.0f);
 	glVertex3f(1, -1, 0.0f);
 	glVertex3f(0, -1, 0);
-	  }
+
 	glEnd();
 	
       }
@@ -355,7 +381,7 @@ void draw()
             glVertex3f(posx + diff, posy - diff, 0.0f);
             glVertex3f(posx + diff, posy + diff, 0.0f);
             glVertex3f(posx - diff, posy + diff, 0.0f);
-	glEnd();		
+            glEnd();		
 	  }
 
 
@@ -471,18 +497,6 @@ brown.push_back(.07);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 
 
-    //Window Hist ---------------------
-    glutInitWindowPosition(800, 300);
-    glutInitWindowSize(300, 300);
-    int wind4=glutCreateWindow("History Window");
-
-    glutKeyboardFunc(KeyboardFunc);
-    glutSpecialFunc(processSpecialKeys);
-
-    glutDisplayFunc(drawHist);
-
-    //End Window Hist -----------------
-
     //Window 2 ---------------------
     glutInitWindowPosition(800, 625);
     glutInitWindowSize(300, 300);
@@ -492,9 +506,22 @@ brown.push_back(.07);
     glutSpecialFunc(processSpecialKeys);
 
     glutDisplayFunc(drawStab);
-
+    glutReshapeFunc( resizeWindow );
 
     //End Window 2 -----------------
+
+    //Window Hist ---------------------
+    glutInitWindowPosition(800, 300);
+    glutInitWindowSize(300, 300);
+    int wind4=glutCreateWindow("History Window");
+
+    glutKeyboardFunc(KeyboardFunc);
+    glutSpecialFunc(processSpecialKeys);
+
+    glutDisplayFunc(drawHist);
+    glutReshapeFunc( resizeWindow );
+    //End Window Hist -----------------
+
 
     //Window 1 ---------------------
     glutInitWindowPosition(20, 60);
@@ -505,11 +532,13 @@ brown.push_back(.07);
     glutSpecialFunc(processSpecialKeys);
 
     glutDisplayFunc(draw);
-
+    glutReshapeFunc( resizeWindow );
     //End Window 1 -----------------
 
 
-    initRendering();
+
+
+    //    initRendering();
 
 
     glutIdleFunc(idle_all);
