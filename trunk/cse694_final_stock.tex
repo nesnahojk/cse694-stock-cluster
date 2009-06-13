@@ -11,7 +11,7 @@
 \maketitle
 
 
-\noindent \textit{Since I was not sure about Carmen size limits you can find all the code and accompanying data at my Google Code repository: http://code.google.com/p/cse694-stock-cluster/source/browse/\#svn/trunk}
+\noindent \textit{Since I was not sure about Carmen size limits you can find all the code and accompanying data at my Google Code repository: http://code.google.com/p/cse694-stock-cluster/source/browse/\#svn/trunk. A makefile is provided.  To run the program pass the final data through a pipe to the executable, for instance cat finaldata.csv | ./stock-vis}
 \begin{multicols}{2}
 \section{Introduction}
 \subsection{Problem Definition}
@@ -26,7 +26,8 @@ I experimented with several transformation sin CSE 730.  The two employed for th
 \subsection{Preprocessing}
 The preprocessing of extracting and cleaning the data is done in C\#.  The principal component analysis and clustering are done in Matlab/Octave.  The stability calculations are done in Python to take advantage of the dynamic typing and well developed set operators.
 \subsection{Display}
-I initially started this application in Processing, but I decided to switch to C++ and OpenGL since my data files were relatively large.  
+I initially started this application in Processing, but I decided to switch to C++ and OpenGL since my data files were relatively large and I never really got comfortable with the I/O of Processing.
+  
 \subsubsection{Main Window}
 In the main window the stocks are plotted based on two principal components of the high dimensional input vector for the input data.  Each cluster is assigned a color.  The color is arbitrary and has no meaning other than as a label.  Keyboard strokes can be used to zoom and scroll.
 
@@ -51,7 +52,8 @@ The keyboard controls are not well though out and are thus not very intuitive.
 	\item ESC: closes the program
 \end{itemize}
 
-\subsection{Screenshots}
+\subsection{Interesting Observations}
+In my CSE 730 project I identified the percent change transformation as more profitable, from examining it in the visualization I can tell that the clusters were very haphazard and not well defined, therefore he transoformation may not be more profitable long term.
 
 
 
