@@ -31,11 +31,11 @@ I initially started this application in Processing, but I decided to switch to C
 In the main window the stocks are plotted based on two principal components of the high dimensional input vector for the input data.  Each cluster is assigned a color.  The color is arbitrary and has no meaning other than as a label.  Keyboard strokes can be used to zoom and scroll.
 
 \subsubsection{Stability Bar Chart Windows}
-The stability bar charts are an idea ``inspired'' by the interpretative dance group presentation.  There are two stability plot windows, one show the stability plot from the begining, the second allows the user to control the time span the stability is calculated over.  There is a bar for each cluster, the stability is not necessarily interpreted as the stability of the cluster, since K-means is not stable across time period.  Even if a cluster stays the exactly the same across time iterations in one cluster it may be labeled as cluster 'x' and in the next it could have label cluster 'y', thus there is no way to track a single cluster across time as the program currently stands.  At each iteration the stability plot can be viewed as the stability of the individual points of the cluster at the current time.  The stability of a point is calculated as the percentage of neighbors that remain the same from time $t-1$ and $t$.  Thus the stability of the cluster is the average of the stability of all points currently in the cluster.  There is a final bar which is the overall stability, which is the average over all points. \\
+The stability bar charts are an idea ``inspired'' by the interpretative dance group presentation.  There is one window, and two bars.  The red bar is the global stability that is calculated from the begining to the current time iteration.  The second, green bar, is a user controlled interval.  The user can increase and decrease the number of lags included by using 'c' and 'v'.
 
-\noindent For inferencing, stability is best viewed as a indication for the current period, and not as a trend, since the cluster labels are unstable.
 \subsubsection{History Window}
-The history window is also an idea ``inspired'' by the interpretative dance group presentation.  I show all time steps up to the currently selected time step.  The previous time steps are faded based on how far in the past they are.  In this plot I no longer have outlines and solids, a faded outline was very hard to see.  In the history plot I argue that the position is more important for inference than the positive or negative indication.  The history window suffers from the fact that in K-means clustering does not consistently label clusters.  
+The history window is also an idea ``inspired'' by the interpretative dance group presentation.  I show plots for all time steps up to the currently selected time step.  The previous time steps are faded based on how far in the past they are.  In this plot I no longer have outlines and solids, a faded outline was very hard to see.  In the history plot I argue that the position is more important for inference than the positive or negative indication.  The history window suffers from the fact that K-means clustering does not consistently label clusters.  Even if a cluster stays exaclty the same during two time periods it may be arbitrarily relabeled since the cluster numebrs are meaningless labels.  I would need to develop a more meaningful way to assign colors, possibly based on PCA location, to overcome this.
+
 \subsubsection{Keyboard Controls}
 The keyboard controls are not well though out and are thus not very intuitive.
 
@@ -45,6 +45,8 @@ The keyboard controls are not well though out and are thus not very intuitive.
 	\item Home: loops through cluster configurations
 	\item X: zoom in
 	\item Z: zoom out
+	\item c: increase the number of lags in user controlled stability plot
+	\item v: decrease the number of lags in user controlled stability plot
 	\item Arrow keys: scroll as would be expected
 	\item ESC: closes the program
 \end{itemize}
