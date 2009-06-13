@@ -55,6 +55,8 @@ void Tokenize(string& str, vector<string>& tokens, const string& delimiters)
     }
 }
 
+int user_select=1;
+
 void KeyboardFunc(unsigned char key, int x, int y) {
     if (key == 27) {
         exit(1);
@@ -62,6 +64,17 @@ void KeyboardFunc(unsigned char key, int x, int y) {
     else if(key=='z')
       {
 	zoom_fac+=.1;
+      }
+    else if(key=='v')
+      {
+	if(user_select>1)
+	  {
+	    user_select--;
+	  }
+      }
+    else if(key=='c')
+      {
+	    user_select++;
       }
     else if(key=='x')
       {
@@ -134,26 +147,83 @@ void initRendering()
 
 
 
-void draw3()
+
+void drawStab()
 {
     glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
-	glBegin(GL_QUADS);					       
+    if(which_time_period>0)
+      {
+    float total=0.0f;
+    float user=0.0f;
 
-	glEnd();		
 
-    glutSwapBuffers();		
-    glutPostRedisplay();
-}
+    //get stab for each stock upto a point
+    for(int k=0;k<400;k++)
+      {
+	for(int i=0;i<which_time_period;i++)
+	  {
+	    switch(which_cluster_size)
+	      {
+	      case 0:
+		total+=stab5[k][i];
+		break;
+	      case 1:
+		total+=stab6[k][i];
+		break;
+	      case 2:
+		total+=stab7[k][i];
+		break;
+	      case 3:
+		total+=stab8[k][i];
+		break;
+	      }
+	  }
+      }
 
-void draw2()
-{
-    glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glLoadIdentity();
-	glBegin(GL_QUADS);					       
-	glEnd();		
+    for(int k=0;k<400;k++)
+      {
+	for(int i=which_time_period-user_select;i<which_time_period;i++)
+	  {
+	    switch(which_cluster_size)
+	      {
+	      case 0:
+		user+=stab5[k][i];
+		break;
+	      case 1:
+		user+=stab6[k][i];
+		break;
+	      case 2:
+		user+=stab7[k][i];
+		break;
+	      case 3:
+		user+=stab8[k][i];
+		break;
+	      }
+	  }
+      }
+
+	glBegin(GL_QUADS);	
+	cout<<user_select<<endl;
+	glColor4f(1,0,0,0);
+	glVertex3f(-1,total/which_time_period/400, 0.0f);
+	glVertex3f(0, total/which_time_period/400, 0.0f);
+	glVertex3f(0, -1, 0.0f);
+	glVertex3f(-1, -1, 0);
+
+	if(which_time_period-user_select>0)
+	  {
+	glColor4f(0,1,0,0);
+	glVertex3f(0,user/(which_time_period-user_select)/400, 0.0f);
+	glVertex3f(1, user/(which_time_period-user_select)/400, 0.0f);
+	glVertex3f(1, -1, 0.0f);
+	glVertex3f(0, -1, 0);
+	  }
+	glEnd();
+	
+      }
+
 
     glutSwapBuffers();		
     glutPostRedisplay();
@@ -300,7 +370,7 @@ void draw()
 
 
 
-void idle_both()
+void idle_all()
 {
     glutSwapBuffers();		
     glutPostRedisplay();
@@ -347,11 +417,6 @@ brown.push_back(.07);
 
   //Read in the data from stdin
 
- float total_max1=FLT_MIN;
- float total_min1=FLT_MAX;
-
- float total_max2=FLT_MIN;
- float total_min2=FLT_MAX;
 
     string s;
     while(getline(cin, s) != NULL)
@@ -365,8 +430,12 @@ brown.push_back(.07);
 	vector<int> c7_temp;
 	vector<int> c8_temp;
 	vector<float> ret_temp;
+        vector<float> stab5_temp;
+        vector<float> stab6_temp;
+        vector<float> stab7_temp;
+        vector<float> stab8_temp;
 	
-	for(int i=0;i<sv.size();i+=7)
+	for(int i=0;i<sv.size();i+=11)
 	  {
 	    pc1_temp.push_back(atof(sv[i].c_str()));
 	    pc2_temp.push_back(atof(sv[i+1].c_str()));
@@ -375,6 +444,10 @@ brown.push_back(.07);
 	    c7_temp.push_back(atoi(sv[i+4].c_str()));
 	    c8_temp.push_back(atoi(sv[i+5].c_str()));
 	    ret_temp.push_back(atof(sv[i+6].c_str()));
+	    stab5_temp.push_back(atof(sv[i+7].c_str()));
+	    stab6_temp.push_back(atof(sv[i+8].c_str()));
+	    stab7_temp.push_back(atof(sv[i+9].c_str()));
+	    stab8_temp.push_back(atof(sv[i+10].c_str()));
 	  }
 		
 	pc1.push_back(pc1_temp);
@@ -384,6 +457,10 @@ brown.push_back(.07);
 	c7.push_back(c7_temp);
 	c8.push_back(c8_temp);
 	returns.push_back(ret_temp);
+	stab5.push_back(stab5_temp);
+	stab6.push_back(stab6_temp);
+	stab7.push_back(stab7_temp);
+	stab8.push_back(stab8_temp);
       }
 
 
@@ -395,8 +472,8 @@ brown.push_back(.07);
 
 
     //Window Hist ---------------------
-    glutInitWindowPosition(20, 60);
-    glutInitWindowSize(720, 720);
+    glutInitWindowPosition(800, 300);
+    glutInitWindowSize(300, 300);
     int wind4=glutCreateWindow("History Window");
 
     glutKeyboardFunc(KeyboardFunc);
@@ -405,6 +482,19 @@ brown.push_back(.07);
     glutDisplayFunc(drawHist);
 
     //End Window Hist -----------------
+
+    //Window 2 ---------------------
+    glutInitWindowPosition(800, 625);
+    glutInitWindowSize(300, 300);
+    int wind2=glutCreateWindow("Stability");
+
+    glutKeyboardFunc(KeyboardFunc);
+    glutSpecialFunc(processSpecialKeys);
+
+    glutDisplayFunc(drawStab);
+
+
+    //End Window 2 -----------------
 
     //Window 1 ---------------------
     glutInitWindowPosition(20, 60);
@@ -418,40 +508,11 @@ brown.push_back(.07);
 
     //End Window 1 -----------------
 
-    //Window 2 ---------------------
-    glutInitWindowPosition(800, 300);
-    glutInitWindowSize(300, 100);
-    int wind2=glutCreateWindow("Total Stability");
-
-    glutKeyboardFunc(KeyboardFunc);
-    glutSpecialFunc(processSpecialKeys);
-
-    glutDisplayFunc(draw2);
-
-
-    //End Window 2 -----------------
-
-    //Window 3 ---------------------
-    glutInitWindowPosition(800, 450);
-    glutInitWindowSize(300, 100);
-
-    int wind3=glutCreateWindow("User Selected Stability");
-
-    glutKeyboardFunc(KeyboardFunc);
-    glutSpecialFunc(processSpecialKeys);
-
-    glutDisplayFunc(draw3);
-
-    //End Window 3 -----------------
-
-
-
-
 
     initRendering();
 
 
-    glutIdleFunc(idle_both);
+    glutIdleFunc(idle_all);
     glutMainLoop();
 
     return (0);
