@@ -10,11 +10,8 @@
 \begin{document}
 \maketitle
 
-\begin{abstract}
- 
-\end{abstract}
 
-
+\textit{Since I was not sure about Carmen size limits you can find all the code and accompanying data at my Google Code repository: http://code.google.com/p/cse694-stock-cluster/source/browse/\#svn/trunk}
 \begin{multicols}{2}
 \section{Introduction}
 \subsection{Problem Definition}
@@ -27,13 +24,41 @@
 \section{Implementation}
 \subsection{Preprocessing}
 \subsection{Display}
+\subsubsection{Main Window}
+In the main window the stocks are plotted based on two principal components of the high dimensional input vector for the input data.
+\subsubsection{Stability Bar Chart Windows}
+\subsubsection{History Window}
 \subsubsection{Keyboard Controls}
+The keyboard controls are not well though out and are thus not very intuitive.
+
+\begin{itemize}
+	\item F2: advances a time step
+	\item F1: decreases a time step
+	\item Home: loops through cluster configurations
+	\item X: zoom in
+	\item Z: zoom out
+	\item Arrow keys: scroll as would be expected
+	\item ESC: closes the program
+\end{itemize}
+
 \subsection{Screenshots}
 
 
 \section{Interesting Observations}
 
 \section{Future Work}
+This is something that I think, if refined, could have useful purposes in my forthcoming career.
+\begin{itemize}
+ \item Make the stability bar charts into boxplots, this would give more inferencing ablity
+ \item Integrate the preprocessing into the display more smoothly
+ \item More professional OpenGL features such as window resizing handling
+ \item Allow selection of a stock, and watch its progression through time
+ \item Apply other similarity measures
+ \item Experiment with other dimensionality reduction techniques
+ \item Explore other data transformations
+ \item Make color assignment less arbitrary at each time step
+\end{itemize}
+
 
 \end{multicols}
 
