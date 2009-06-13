@@ -1,0 +1,68 @@
+\documentclass{article}
+
+\usepackage{fullpage}
+\usepackage{multicol}
+
+\author{Keith Johansen}
+\title{Exploring Clustered Financial Data}
+\date{Spring 2009}
+
+\begin{document}
+\maketitle
+
+
+
+\begin{multicols}{2}
+\section{Introduction}
+\subsection{Problem Definition}
+
+\subsection{Motivation}
+
+\section{Data}
+\subsection{Transformations}
+
+\section{Implementation}
+\subsection{Preprocessing}
+\subsection{Display}
+\subsubsection{Keyboard Controls}
+The keyboard controls are not well though out and are thus not very intuitive.
+
+\begin{itemize}
+	\item F1: advances a time step
+	\item F2: decreases a time step
+	\item Home: loops through cluster configurations
+	\item X: zoom in
+	\item Z: zoom out
+	\item Arrow keys: scroll as would be expected
+	\item ESC: closes the program
+\end{itemize}
+
+\subsection{Screenshots}
+
+
+\section{Interesting Observations}
+
+Integrate preprocessing → move to OpenGL and C++
+Select a stock and “watch” it
+Apply other similarity measures → pair trades
+Nonlinear dimensionality reduction
+Explore other data transformations
+Make colors less arbitrary
+
+
+\section{Future Work}
+\begin{itemize}
+ \item Integrate the preprocessing into the display more smoothly
+ \item More professional OpenGL features such as window resizing handling
+ \item Allow selection of a stock, and watch its progression through time
+ \item Apply other similarity measures
+ \item Experiment with other dimensionality reduction techniques
+ \item Explore other data transformations
+ \item Make color assignment less arbitrary at each time step
+\end{itemize}
+
+
+\end{multicols}
+
+\end{document}
+
