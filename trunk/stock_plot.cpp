@@ -83,13 +83,13 @@ void processSpecialKeys(int key, int x, int y) {
 
 
     switch (key) {
-    case GLUT_KEY_F1:
+    case GLUT_KEY_F2:
       if(which_time_period<max_time_steps-1)
 	{
 	  which_time_period++;
 	}
       break;
-    case GLUT_KEY_F2:
+    case GLUT_KEY_F1:
       if(which_time_period>0)
 	{
 	  which_time_period--;
@@ -127,8 +127,8 @@ void initRendering()
     glEnable(GL_LINE_SMOOTH);
     glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
     glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable (GL_BLEND); 
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 
@@ -140,33 +140,7 @@ void draw3()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 	glBegin(GL_QUADS);					       
-	for(int i=0;i<400;i++)
-	  {
-	    float posx=(pc1[i][which_time_period]/zoom_fac)-offsetx;
-	    float posy=(pc2[i][which_time_period]/zoom_fac)-offsety;
-	    float diff=.01*(1+returns[i][which_time_period]);
 
-	    switch(which_cluster_size)
-	      {
-	      case 0:
-		glColor3f(col[c5[i][which_time_period]-1][0], col[c5[i][which_time_period]-1][1], col[c5[i][which_time_period]-1][2]);
-		break;
-	      case 1:
-		glColor3f(col[c6[i][which_time_period]-1][0], col[c6[i][which_time_period]-1][1], col[c6[i][which_time_period]-1][2]);
-		break;
-	      case 2:
-		glColor3f(col[c7[i][which_time_period]-1][0], col[c7[i][which_time_period]-1][1], col[c7[i][which_time_period]-1][2]);
-		break;
-	      case 3:
-		glColor3f(col[c8[i][which_time_period]-1][0], col[c8[i][which_time_period]-1][1], col[c8[i][which_time_period]-1][2]);
-		break;
-	      }
-
-            glVertex3f(posx - diff, posy - diff, 0.0f);
-            glVertex3f(posx + diff, posy - diff, 0.0f);
-            glVertex3f(posx + diff, posy + diff, 0.0f);
-            glVertex3f(posx - diff, posy + diff, 0.0f);
-	  }
 	glEnd();		
 
     glutSwapBuffers();		
@@ -179,24 +153,47 @@ void draw2()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 	glBegin(GL_QUADS);					       
+	glEnd();		
+
+    glutSwapBuffers();		
+    glutPostRedisplay();
+}
+
+void drawHist()
+{
+    glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
+    
+
+    glLoadIdentity();
+			       
+    for(int t=0;t<=which_time_period-1;t++)
+      {
 	for(int i=0;i<400;i++)
 	  {
-	    float posx=(pc1[i][which_time_period]/zoom_fac)-offsetx;
-	    float posy=(pc2[i][which_time_period]/zoom_fac)-offsety;
-	    float diff=.01*(1+returns[i][which_time_period]);
+	    glBegin(GL_QUADS);		
+
+	    float posx=(pc1[i][t]/zoom_fac)-offsetx;
+	    float posy=(pc2[i][t]/zoom_fac)-offsety;
+	    float diff=.01*(1.0+2*returns[i][t]);
 	    switch(which_cluster_size)
 	      {
+		
 	      case 0:
-		glColor3f(col[c5[i][which_time_period]-1][0], col[c5[i][which_time_period]-1][1], col[c5[i][which_time_period]-1][2]);
+		glColor4f(col[c5[i][t]-1][0], col[c5[i][t]-1][1], col[c5[i][t]-1][2],(float)(t+1)/(float)(which_time_period+1)/10);
 		break;
 	      case 1:
-		glColor3f(col[c6[i][which_time_period]-1][0], col[c6[i][which_time_period]-1][1], col[c6[i][which_time_period]-1][2]);
+		glColor4f(col[c6[i][t]-1][0], col[c6[i][t]-1][1], col[c6[i][t]-1][2],(float)(t+1)/(float)(which_time_period+1)/10);
 		break;
 	      case 2:
-		glColor3f(col[c7[i][which_time_period]-1][0], col[c7[i][which_time_period]-1][1], col[c7[i][which_time_period]-1][2]);
+		glColor4f(col[c7[i][t]-1][0], col[c7[i][t]-1][1], col[c7[i][t]-1][2],(float)(t+1)/(float)(which_time_period+1)/10);
 		break;
 	      case 3:
-		glColor3f(col[c8[i][which_time_period]-1][0], col[c8[i][which_time_period]-1][1], col[c8[i][which_time_period]-1][2]);
+		glColor4f(col[c8[i][t]-1][0], col[c8[i][t]-1][1], col[c8[i][t]-1][2],(float)(t+1)/(float)(which_time_period+1)/10);
 		break;
 	      }
 
@@ -204,8 +201,46 @@ void draw2()
             glVertex3f(posx + diff, posy - diff, 0.0f);
             glVertex3f(posx + diff, posy + diff, 0.0f);
             glVertex3f(posx - diff, posy + diff, 0.0f);
-	  }
 	glEnd();		
+	  }
+      }
+
+	for(int i=0;i<400;i++)
+	  {
+	    	    if(returns[i][which_time_period]>0)
+	    {
+		glBegin(GL_QUADS);		
+		}
+			    else
+			      {
+				glBegin(GL_LINE_LOOP);
+	  }
+	    float posx=(pc1[i][which_time_period]/zoom_fac)-offsetx;
+	    float posy=(pc2[i][which_time_period]/zoom_fac)-offsety;
+	    float diff=.01*(1.0+2*returns[i][which_time_period]);
+	    switch(which_cluster_size)
+	      {
+		
+	      case 0:
+		glColor4f(col[c5[i][which_time_period]-1][0], col[c5[i][which_time_period]-1][1], col[c5[i][which_time_period]-1][2],1);
+		break;
+	      case 1:
+		glColor4f(col[c6[i][which_time_period]-1][0], col[c6[i][which_time_period]-1][1], col[c6[i][which_time_period]-1][2],1);
+		break;
+	      case 2:
+		glColor4f(col[c7[i][which_time_period]-1][0], col[c7[i][which_time_period]-1][1], col[c7[i][which_time_period]-1][2],1);
+		break;
+	      case 3:
+		glColor4f(col[c8[i][which_time_period]-1][0], col[c8[i][which_time_period]-1][1], col[c8[i][which_time_period]-1][2],1);
+		break;
+	      }
+
+            glVertex3f(posx - diff, posy - diff, 0.0f);
+            glVertex3f(posx + diff, posy - diff, 0.0f);
+            glVertex3f(posx + diff, posy + diff, 0.0f);
+            glVertex3f(posx - diff, posy + diff, 0.0f);
+	glEnd();		
+	  }
 
     glutSwapBuffers();		
     glutPostRedisplay();
@@ -229,7 +264,7 @@ void draw()
 	      }
 	    float posx=(pc1[i][which_time_period]/zoom_fac)-offsetx;
 	    float posy=(pc2[i][which_time_period]/zoom_fac)-offsety;
-	    float diff=.01*(1.0+4*returns[i][which_time_period]);
+	    float diff=.01*(1.0+2*returns[i][which_time_period]);
 	    switch(which_cluster_size)
 	      {
 	      case 0:
@@ -257,6 +292,12 @@ void draw()
     glutSwapBuffers();		
     glutPostRedisplay();
 }
+
+
+
+
+
+
 
 
 void idle_both()
@@ -353,10 +394,22 @@ brown.push_back(.07);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 
 
+    //Window Hist ---------------------
+    glutInitWindowPosition(20, 60);
+    glutInitWindowSize(720, 720);
+    int wind4=glutCreateWindow("History Window");
+
+    glutKeyboardFunc(KeyboardFunc);
+    glutSpecialFunc(processSpecialKeys);
+
+    glutDisplayFunc(drawHist);
+
+    //End Window Hist -----------------
+
     //Window 1 ---------------------
     glutInitWindowPosition(20, 60);
     glutInitWindowSize(720, 720);
-    int wind1=glutCreateWindow("1");
+    int wind1=glutCreateWindow("Plotting Window");
 
     glutKeyboardFunc(KeyboardFunc);
     glutSpecialFunc(processSpecialKeys);
@@ -366,9 +419,9 @@ brown.push_back(.07);
     //End Window 1 -----------------
 
     //Window 2 ---------------------
-    glutInitWindowPosition(700, 300);
-    glutInitWindowSize(300, 50);
-    int wind2=glutCreateWindow("2");
+    glutInitWindowPosition(800, 300);
+    glutInitWindowSize(300, 100);
+    int wind2=glutCreateWindow("Total Stability");
 
     glutKeyboardFunc(KeyboardFunc);
     glutSpecialFunc(processSpecialKeys);
@@ -379,10 +432,10 @@ brown.push_back(.07);
     //End Window 2 -----------------
 
     //Window 3 ---------------------
-    glutInitWindowPosition(800, 400);
-    glutInitWindowSize(300, 50);
+    glutInitWindowPosition(800, 450);
+    glutInitWindowSize(300, 100);
 
-    int wind3=glutCreateWindow("2");
+    int wind3=glutCreateWindow("User Selected Stability");
 
     glutKeyboardFunc(KeyboardFunc);
     glutSpecialFunc(processSpecialKeys);
@@ -390,6 +443,11 @@ brown.push_back(.07);
     glutDisplayFunc(draw3);
 
     //End Window 3 -----------------
+
+
+
+
+
     initRendering();
 
 
